@@ -1,0 +1,8 @@
+{
+  "name":"Inventário do Armário RP - NPa Bocaina",
+  "short_name":"Inventário RP",
+  "start_url":"./index.html",
+  "display":"standalone",
+  "background_color":"#eef3f8",
+  "theme_color":"#0b2d52"
+}
