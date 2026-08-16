@@ -1,8 +1,8 @@
 /* CONTROLE abaixo do cabeçalho. Mantém os botões clicáveis e não cobre o header. */
 html,body{overflow-x:hidden!important}
-.sidebar{position:fixed!important;top:238px!important;left:0!important;right:auto!important;bottom:0!important;width:205px!important;height:calc(100vh - 238px)!important;min-height:0!important;max-height:none!important;overflow-y:auto!important;overflow-x:hidden!important;z-index:999!important;transform:none!important;align-self:flex-start!important;pointer-events:auto!important}
+.sidebar{position:absolute!important;top:238px!important;left:0!important;right:auto!important;bottom:auto!important;width:205px!important;height:calc(100vh - 238px)!important;min-height:calc(100vh - 238px)!important;max-height:none!important;overflow-y:auto!important;overflow-x:hidden!important;z-index:30!important;transform:none!important;align-self:flex-start!important;pointer-events:auto!important}
 .sidebar .nav,.sidebar .loc-btn{pointer-events:auto!important;cursor:pointer!important}
 .content{position:relative!important;margin-left:205px!important;min-height:100vh!important;z-index:1!important}
-@media(max-width:1150px) and (min-width:901px){.sidebar{top:210px!important;height:calc(100vh - 210px)!important;width:180px!important}.content{margin-left:180px!important}}
-@media(max-width:900px) and (min-width:701px){.sidebar{top:165px!important;height:calc(100vh - 165px)!important;width:180px!important}.content{margin-left:180px!important}}
-@media(max-width:700px){.sidebar{position:fixed!important;top:0!important;left:0!important;right:auto!important;bottom:0!important;width:255px!important;height:100vh!important;max-height:100vh!important}.content{margin-left:0!important}}
+@media(max-width:1150px) and (min-width:901px){.sidebar{top:210px!important;height:calc(100vh - 210px)!important;width:180px!important;min-height:calc(100vh - 210px)!important}.content{margin-left:180px!important}}
+@media(max-width:900px) and (min-width:701px){.sidebar{top:165px!important;height:calc(100vh - 165px)!important;width:180px!important;min-height:calc(100vh - 165px)!important}.content{margin-left:180px!important}}
+@media(max-width:700px){.sidebar{position:fixed!important;top:0!important;left:0!important;right:auto!important;bottom:0!important;width:255px!important;height:100vh!important;min-height:100vh!important;max-height:100vh!important;z-index:99999!important}.content{margin-left:0!important}}
