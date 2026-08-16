@@ -10,33 +10,17 @@ function aplicar(){
  }
  if(!document.documentElement.dataset.qtdCardapioCorrigida){
   document.documentElement.dataset.qtdCardapioCorrigida='1';
-  document.addEventListener('click',e=>{
-   const btn=e.target.closest('[data-select],[data-add]');if(!btn)return;
-   const qty=document.querySelector('#menuQty');const genre=document.querySelector('#menuGenre');const idx=btn.dataset.select;
-   if(idx!=null&&genre)genre.value=String(idx);if(qty){qty.value='';qty.defaultValue='';qty.removeAttribute('value');}
-   if(btn.dataset.select!=null){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();if(qty)qty.focus()}
-  },true);
+  document.addEventListener('click',e=>{const btn=e.target.closest('[data-select],[data-add]');if(!btn)return;const qty=document.querySelector('#menuQty');const genre=document.querySelector('#menuGenre');const idx=btn.dataset.select;if(idx!=null&&genre)genre.value=String(idx);if(qty){qty.value='';qty.defaultValue='';qty.removeAttribute('value');}if(btn.dataset.select!=null){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();if(qty)qty.focus()}},true);
  }
- return !!sec;
+ if(!document.documentElement.dataset.mensalRP){
+  document.documentElement.dataset.mensalRP='1';
+  const money=v=>Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+  const monthKey=v=>{if(!v)return '';const m=String(v).slice(0,7);return m};
+  const atualizarMensal=()=>{const panel=document.querySelector('.stock-panel[data-panel="semanal"]');if(!panel)return;const totalWeek=panel.querySelector('.weekly-total');if(!totalWeek)return;let box=panel.querySelector('#monthlyForecast');if(!box){box=document.createElement('div');box.id='monthlyForecast';box.style.cssText='background:#e8f5ec;border:1px solid #9ed0ad;border-radius:7px;margin-top:8px;padding:12px;display:flex;justify-content:space-between;align-items:center;gap:12px;color:#176b3a;font-weight:900;flex-wrap:wrap';totalWeek.insertAdjacentElement('afterend',box)}const start=panel.querySelector('#weekStart')?.value||'';const month=monthKey(start);const saved=JSON.parse(localStorage.getItem('bocaina_weeklyPlans')||'[]');const weeks=saved.filter(w=>monthKey(w.start)===month).slice(0,4);const sum=weeks.reduce((a,w)=>a+Number(w.total||0),0);box.innerHTML='<span><b>TOTAL PREVISTO MENSAL</b><small style="display:block;font-weight:600;margin-top:3px">'+weeks.length+' de 4 semanas salvas em '+(month?month.split('-').reverse().join('/'):'mês selecionado')+'</small></span><strong style="font-size:20px">'+money(sum)+'</strong>'};
+  const watch=()=>{atualizarMensal();setTimeout(watch,500)};watch();document.addEventListener('input',atualizarMensal);document.addEventListener('change',atualizarMensal);window.addEventListener('storage',atualizarMensal);
+ }
+ return true;
 }
 function wait(){if(aplicar())return;setTimeout(wait,150)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',wait);else wait();
-
-// Total previsto mensal: mostra a soma das quatro semanas salvas do mês selecionado.
-function instalarTotalMensal(){
- const footer=document.querySelector('#wkFooter');
- if(!footer)return false;
- if(!document.querySelector('#totalMensalRP')){
-  const style=document.createElement('style');style.id='totalMensalRPcss';style.textContent='.total-mensal-rp{background:#fff;border:2px solid #2e8b57;border-radius:8px;padding:13px;margin-top:10px;display:flex;justify-content:space-between;align-items:center;gap:12px}.total-mensal-rp .titulo{font-weight:900;color:#17324f}.total-mensal-rp .detalhe{font-size:9px;color:#667085;margin-top:4px}.total-mensal-rp .valor{font-size:20px;font-weight:900;color:#21864b}.total-mensal-rp .semanas{font-size:9px;color:#21864b;font-weight:700;margin-top:5px}';document.head.appendChild(style);
-  const box=document.createElement('div');box.id='totalMensalRP';box.className='total-mensal-rp';footer.closest('.weekly-total')?.parentNode.insertBefore(box,footer.closest('.weekly-total').nextSibling);
- }
- const box=document.querySelector('#totalMensalRP'),input=document.querySelector('#weekStart');if(!box||!input)return false;
- const mes=(input.value||'').slice(0,7), planos=JSON.parse(localStorage.getItem('bocaina_weeklyPlans')||'[]');
- const semanas=planos.filter(w=>String(w.start||'').slice(0,7)===mes).sort((a,b)=>String(a.start).localeCompare(String(b.start))).slice(0,4);
- const total=semanas.reduce((s,w)=>s+Number(w.total||0),0);const nome=mes?new Date(mes+'-01T12:00:00').toLocaleDateString('pt-BR',{month:'long',year:'numeric'}):'mês selecionado';
- box.innerHTML='<div><div class="titulo">TOTAL PREVISTO MENSAL</div><div class="detalhe">'+semanas.length+' de 4 planejamentos semanais salvos em '+nome+'</div><div class="semanas">'+(semanas.map((w,i)=>'Semana '+(i+1)+': '+Number(w.total||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})).join(' • ')||'Nenhum planejamento salvo neste mês.')+'</div></div><div class="valor">'+total.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})+'</div>';
- if(!input.dataset.mensalRP){input.dataset.mensalRP='1';input.addEventListener('change',instalarTotalMensal)}return true;
-}
-function waitMensal(){if(instalarTotalMensal())return;setTimeout(waitMensal,300)}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',waitMensal);else waitMensal();
 })();
