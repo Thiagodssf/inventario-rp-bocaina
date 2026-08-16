@@ -1,5 +1,5 @@
-const CACHE='bocaina-rp-v25';
-const ASSETS=['./','./index.html','./styles.css','./header-overrides.css','./sidebar-fix.css?v=1','./script.js','./stock.js','./menu-overrides.js','./municiamento-banco.js','./cardapio.js?v=23','./cardapio-etapas-multiplas.js?v=9','./banco-generos-ajuste.js?v=23','./planejamento-semanal.js?v=23','./planejamento-mensal.js?v=9','./despesa-autorizada-banco.js?v=8','./cardapio-layout-final.js?v=4','./cardapio-edit-fix.js?v=2','./manifest.webmanifest','./brasao-bocaina.png','./Marinhalogo.svg'];
+const CACHE='bocaina-rp-v26';
+const ASSETS=['./','./index.html','./styles.css','./header-overrides.css?v=2','./sidebar-fix.css?v=2','./script.js','./stock.js','./menu-overrides.js','./municiamento-banco.js','./cardapio.js?v=23','./cardapio-etapas-multiplas.js?v=9','./banco-generos-ajuste.js?v=23','./planejamento-semanal.js?v=23','./planejamento-mensal.js?v=9','./despesa-autorizada-banco.js?v=8','./cardapio-layout-final.js?v=4','./cardapio-edit-fix.js?v=2','./manifest.webmanifest','./brasao-bocaina.png','./Marinhalogo.svg'];
 self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)))});
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',e=>e.respondWith(fetch(e.request).then(r=>{const copy=r.clone();caches.open(CACHE).then(c=>c.put(e.request,copy));return r}).catch(()=>caches.match(e.request))));
