@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b2d52">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Inventário RP">
+<link rel="manifest" href="manifest.webmanifest">
+<title>NPa Bocaina P-62 • Inventário RP</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <img src="brasao-bocaina.png" alt="Brasão do NPa Bocaina">
+      <div><b>NPa BOCAINA</b><span>P-62</span></div>
+    </div>
+    <div class="sidebar-title">INVENTÁRIO<br>DO ARMÁRIO</div>
+    <nav id="mainNav">
+      <button class="nav active" data-view="inventory"><span class="ico">▤</span> Inventário Geral</button>
+      <button class="nav" data-view="summary"><span class="ico">▥</span> Resumo</button>
+      <button class="nav" data-view="locations"><span class="ico">▦</span> Localizações</button>
+    </nav>
+    <div class="nav-title">LOCALIZAÇÕES</div>
+    <div id="locationNav"></div>
+    <div class="motto">Tradição, Disciplina<br>e Compromisso!</div>
+    <div class="side-footer">⚓ NPa Bocaina – P-62</div>
+  </aside>
+
+  <main class="content">
+    <header class="top">
+      <button class="mobile-menu" id="mobileMenu" aria-label="Abrir menu">☰</button>
+      <div class="top-title">
+        <div class="smallcaps">MARINHA DO BRASIL</div>
+        <h1>NPa BOCAINA <em>P-62</em></h1>
+        <strong>Relações Públicas</strong>
+      </div>
+      <div class="top-status"><span class="dot"></span> INVENTÁRIO ATUALIZADO</div>
+    </header>
+
+    <div class="page">
+      <section class="stats">
+        <div class="stat"><span>Total de Materiais</span><b>69</b><i>◆</i></div>
+        <div class="stat"><span>Compartimentos</span><b>4</b><i>▱</i></div>
+        <div class="stat"><span>Gavetas</span><b>4</b><i>▤</i></div>
+        <div class="stat"><span>Localizações</span><b>8</b><i>●</i></div>
+        <div class="update"><span>STATUS DO INVENTÁRIO</span><b>✓ ATUALIZADO</b><small>Última conferência: inventário atual</small></div>
+      </section>
+
+      <section id="inventory" class="view active">
+        <div class="section-title">
+          <div><span class="section-icon">▤</span><h2>Inventário Geral</h2><p>Todos os materiais do armário do RP — P-62 NPa Bocaina</p></div>
+        </div>
+        <div class="filterbar">
+          <label>LOCALIZAÇÃO<select id="locationFilter"><option value="">Todos</option></select></label>
+          <label>TIPO<select id="typeFilter"><option value="">Todos</option></select></label>
+          <label class="search">BUSCAR MATERIAL<input id="search" type="search" placeholder="Digite para pesquisar..."></label>
+        </div>
+        <div class="table-card">
+          <div class="table-scroll">
+            <table><thead><tr><th>ID</th><th>Localização</th><th>Material</th><th>Quantidade</th><th>Tipo</th><th>Observações</th></tr></thead>
+            <tbody id="tbody"></tbody></table>
+          </div>
+          <div class="table-footer"><span>Itens exibidos: <b id="shown">69</b></span><span>Total de itens: <b>69</b></span></div>
+        </div>
+      </section>
+
+      <section id="summary" class="view">
+        <div class="section-title"><div><span class="section-icon">▥</span><h2>Resumo</h2><p>Visão rápida da distribuição do armário.</p></div></div>
+        <div id="summaryGrid" class="summary-grid"></div>
+      </section>
+
+      <section id="locations" class="view">
+        <div class="section-title"><div><span class="section-icon">▦</span><h2>Localizações</h2><p>Selecione um compartimento ou gaveta para consultar seus materiais.</p></div></div>
+        <div id="locationGrid" class="location-grid"></div>
+      </section>
+    </div>
+  </main>
+</div>
+<script src="script.js"></script><script>if("serviceWorker" in navigator && location.protocol!=="file:"){navigator.serviceWorker.register("service-worker.js").catch(()=>{});}</script>
+</body>
+</html>
