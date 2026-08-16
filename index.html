@@ -12,11 +12,12 @@
 <link rel="stylesheet" href="styles.css">
 <style>
 .header-pr{font-family:"Arial Narrow","Roboto Condensed","Segoe UI",Arial,sans-serif;font-size:25px;font-weight:800;letter-spacing:.2px;white-space:nowrap}
-.header-navy{font-family:"Arial Narrow","Roboto Condensed","Segoe UI",Arial,sans-serif}
-.header-navy b,.header-navy strong{font-family:"Arial Narrow","Roboto Condensed","Segoe UI",Arial,sans-serif;font-weight:800;letter-spacing:1px}
+.header-navy{font-family:"Arial Narrow","Roboto Condensed","Segoe UI",Arial,sans-serif;display:flex;align-items:center;gap:10px;min-width:175px}
+.header-navy>div{display:flex;flex-direction:column;gap:4px;line-height:1;white-space:nowrap}
+.header-navy b,.header-navy strong{font-family:"Arial Narrow","Roboto Condensed","Segoe UI",Arial,sans-serif;font-weight:800;letter-spacing:1.2px;display:block;line-height:1}
 .header-navy b{font-size:17px}.header-navy strong{font-size:16px}
-@media(max-width:1150px){.header-pr{font-size:21px}.header-navy b{font-size:14px}.header-navy strong{font-size:13px}}
-@media(max-width:900px){.header-pr{font-size:17px}.header-navy b{font-size:11px}.header-navy strong{font-size:10px}}
+@media(max-width:1150px){.header-pr{font-size:21px}.header-navy{min-width:145px}.header-navy>div{gap:3px}.header-navy b{font-size:14px}.header-navy strong{font-size:13px}}
+@media(max-width:900px){.header-pr{font-size:17px}.header-navy{min-width:110px;gap:6px}.header-navy>div{gap:3px}.header-navy b{font-size:11px}.header-navy strong{font-size:10px}}
 </style>
 </head>
 <body>
