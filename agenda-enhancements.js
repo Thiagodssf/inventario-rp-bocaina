@@ -2,6 +2,7 @@
 const cats=['Todas','Administrativo','Operacional','Reunião','Cerimonial','Prazo','Visita','Pessoal','Outro'];
 const colors={Todas:'#1a73e8',Administrativo:'#1a73e8',Operacional:'#188038','Reunião':'#7b61c9',Cerimonial:'#c27c0e',Prazo:'#d93025',Visita:'#00838f',Pessoal:'#8e24aa',Outro:'#f29900'};
 function fix(){const side=document.querySelector('#agenda .ag-side');if(!side)return false;const old=[...side.querySelectorAll('.ag-side-section')].find(x=>/Minhas agendas/.test(x.textContent));if(old&&!old.dataset.fixed){old.dataset.fixed='1';old.innerHTML='<h4>Minhas agendas</h4>'+cats.map(c=>`<div class="ag-cal-row" data-cat="${c}"><span class="ag-dot" style="background:${colors[c]}"></span>${c}</div>`).join('');const up=document.createElement('div');up.className='ag-side-section ag-upcoming';up.innerHTML='<h4>Próximos compromissos</h4><div id="agUpcoming"></div>';side.appendChild(up);return true}return false}
-function boot(){fix();setTimeout(fix,300);setTimeout(fix,1000)}
+function loadAniversariantes(){if(document.querySelector('script[data-aniversariantes-loader]'))return;const s=document.createElement('script');s.src='aniversariantes-v2.js?v=2';s.dataset.aniversariantesLoader='1';s.async=false;document.body.appendChild(s)}
+function boot(){fix();loadAniversariantes();setTimeout(fix,300);setTimeout(fix,1000)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();document.addEventListener('bocaina:agenda-updated',fix);
 })();
