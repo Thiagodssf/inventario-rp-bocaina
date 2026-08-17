@@ -19,7 +19,15 @@ function preparePlanningTabs(){
   add('semanal','Planejamento Semanal','📅');
   add('mensal','Planejamento Mensal','📊');
 }
-async function ensure(tab){await ensureBase();preparePlanningTabs();for(const key of (dependencies[tab]||[]))await load(key);if(typeof window.initStock==='function')window.initStock()}
+function activate(tab){
+  const stock=document.querySelector('#stock');
+  const nav=stock?.querySelector('.stock-subtabs');
+  const content=stock?.querySelector('#stockSubContent');
+  if(!nav||!content)return;
+  nav.querySelectorAll('.stock-subtab').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
+  content.querySelectorAll('.stock-panel').forEach(p=>p.classList.toggle('active',p.dataset.panel===tab));
+}
+async function ensure(tab){await ensureBase();preparePlanningTabs();for(const key of (dependencies[tab]||[]))await load(key);if(typeof window.initStock==='function')window.initStock();activate(tab)}
 function bind(){
   document.addEventListener('click',e=>{
     const main=e.target.closest('.nav[data-view="stock"]');
