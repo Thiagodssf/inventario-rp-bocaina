@@ -1,46 +1,20 @@
-(()=>{ 'use strict';
+(()=>{
+'use strict';
 function init(){
- const qs=s=>document.querySelector(s);
- const rpSub=qs('#rpSubnav');
- if(rpSub&&!qs('.rp-aniversariantes')){
-   const inv=rpSub.querySelector('[data-view="inventory"]');
-   const b=document.createElement('button');
-   b.type='button'; b.className='nav rp-aniversariantes'; b.dataset.view='anivDataPanel';
-   b.innerHTML='<span class="ico">🎂</span> Aniversariantes';
-   if(inv) inv.insertAdjacentElement('afterend',b); else rpSub.prepend(b);
- }
- if(!qs('#aniversariantes')&&!qs('#anivDataPanel')){
-   const page=qs('.page');
-   if(page){
-     const sec=document.createElement('section');
-     sec.id='aniversariantes'; sec.className='view';
-     sec.innerHTML='<div class="section-title"><div><span class="section-icon">🎂</span><h2>ANIVERSARIANTES</h2><p>Militares/ Organizações Militares</p></div></div>';
-     page.appendChild(sec);
-   }
- }
- const loadAniv=()=>{
-   if(window.__anivLoaded)return;
-   window.__anivLoaded=true;
-   const s=document.createElement('script');
-   s.src='aniversariantes-v2.js?v=3';
-   s.async=true;
-   s.onerror=()=>{window.__anivLoaded=false;console.error('Falha ao carregar Aniversariantes');};
-   document.head.appendChild(s);
- };
- const show=v=>{
-   const current=[...document.querySelectorAll('.view')];
-   current.forEach(x=>x.classList.toggle('active',x.id===v));
-   document.querySelectorAll('.nav[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===v));
-   if(v==='summary'&&typeof window.renderSummary==='function')window.renderSummary();
-   if(v==='inventory'&&typeof window.renderTable==='function')window.renderTable();
-   if(v==='anivDataPanel'){loadAniv();}
- };
- document.querySelectorAll('.nav[data-view]').forEach(b=>{
-   b.onclick=e=>{e.preventDefault();e.stopPropagation();show(b.dataset.view)};
+ const p=document.getElementById('rpParent');
+ const s=document.getElementById('rpSubnav');
+ if(!p||!s||p.dataset.rpBound==='1')return;
+ p.dataset.rpBound='1';
+ p.addEventListener('click',e=>{
+   e.preventDefault();
+   const open=s.classList.toggle('collapsed')===false;
+   p.classList.toggle('open',open);
+   p.setAttribute('aria-expanded',String(open));
  });
- document.querySelectorAll('.loc-btn').forEach(b=>{b.onclick=e=>{e.preventDefault();e.stopPropagation();const loc=b.dataset.loc;show('inventory');const f=qs('#locationFilter');if(f){f.value=loc;f.dispatchEvent(new Event('change'))}}});
- const mm=qs('#mobileMenu');if(mm)mm.onclick=e=>{e.preventDefault();e.stopPropagation();const s=qs('#sidebar');if(s)s.classList.toggle('open')};
- show('inventory');
+ document.addEventListener('click',e=>{
+   const v=e.target.closest('.nav[data-view="inventory"]');
+   if(v){s.classList.remove('collapsed');p.classList.add('open');p.setAttribute('aria-expanded','true');}
+ });
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
