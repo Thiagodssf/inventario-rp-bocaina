@@ -46,9 +46,10 @@ function activate(view){
 function bind(){
   ensureAnivStructure();
   document.querySelectorAll('.nav[data-view]').forEach(b=>{
+    if(b.dataset.view==='agenda')return;
     if(b.dataset.navBound==='1')return;
     b.dataset.navBound='1';
-    b.onclick=e=>{e.preventDefault();if(b.dataset.view!=='agenda')e.stopPropagation();activate(b.dataset.view)};
+    b.onclick=e=>{e.preventDefault();e.stopPropagation();activate(b.dataset.view)};
   });
   document.querySelectorAll('#locationNav .loc-btn').forEach(b=>{
     if(b.dataset.navBound==='1')return;
