@@ -39,7 +39,6 @@ function activate(view){
   document.querySelectorAll('.nav[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===view));
   if(view==='stock' && typeof window.initStock==='function')window.initStock();
   if(view==='aniversariantes')loadAniv();
-  if(view==='agenda')document.dispatchEvent(new Event('bocaina:open-agenda'));
   window.scrollTo({top:0,behavior:'smooth'});
   const sidebar=document.getElementById('sidebar');
   if(window.innerWidth<701&&sidebar)sidebar.classList.remove('open');
@@ -49,7 +48,7 @@ function bind(){
   document.querySelectorAll('.nav[data-view]').forEach(b=>{
     if(b.dataset.navBound==='1')return;
     b.dataset.navBound='1';
-    b.onclick=e=>{e.preventDefault();e.stopPropagation();activate(b.dataset.view)};
+    b.onclick=e=>{e.preventDefault();if(b.dataset.view!=='agenda')e.stopPropagation();activate(b.dataset.view)};
   });
   document.querySelectorAll('#locationNav .loc-btn').forEach(b=>{
     if(b.dataset.navBound==='1')return;
