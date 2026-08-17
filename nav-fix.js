@@ -7,17 +7,18 @@ function ensureAnivStructure(){
     const b=document.createElement('button');
     b.type='button';
     b.className='nav rp-aniversariantes';
-    b.dataset.view='anivDataPanel';
+    b.dataset.view='aniversariantes';
     b.innerHTML='<span class="ico">🎂</span> Aniversariantes';
     const inv=rpSub.querySelector('[data-view="inventory"]');
     if(inv) inv.insertAdjacentElement('afterend',b); else rpSub.prepend(b);
   }
-  if(!document.getElementById('anivDataPanel')){
+  if(!document.getElementById('anivDataPanel')&&!document.getElementById('aniversariantes')){
     const page=document.querySelector('.page');
     if(page){
       const sec=document.createElement('section');
-      sec.id='anivDataPanel';
+      sec.id='aniversariantes';
       sec.className='view';
+      sec.innerHTML='<div class="section-title"><div><span class="section-icon">🎂</span><h2>ANIVERSARIANTES</h2><p>Militares/ Organizações Militares</p></div></div>';
       page.appendChild(sec);
     }
   }
@@ -28,19 +29,19 @@ function loadAniv(){
   const s=document.createElement('script');
   s.src='aniversariantes-v2.js?v=3';
   s.async=false;
-  s.onload=()=>{ if(typeof window.initAniversariantes==='function') window.initAniversariantes(); };
-  s.onerror=()=>{ window.__anivLoaded=false; console.error('Falha ao carregar Aniversariantes'); };
+  s.onerror=()=>{window.__anivLoaded=false;console.error('Falha ao carregar Aniversariantes');};
   document.body.appendChild(s);
 }
 function activate(view){
+  const target=(view==='aniversariantes')?'aniversariantes':view;
   const views=document.querySelectorAll('.view');
-  views.forEach(v=>v.classList.toggle('active',v.id===view));
+  views.forEach(v=>v.classList.toggle('active',v.id===target||((view==='aniversariantes')&&v.id==='anivDataPanel')));
   document.querySelectorAll('.nav[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===view));
-  if(view==='stock' && typeof window.initStock==='function') window.initStock();
-  if(view==='anivDataPanel') loadAniv();
+  if(view==='stock' && typeof window.initStock==='function')window.initStock();
+  if(view==='aniversariantes')loadAniv();
   window.scrollTo({top:0,behavior:'smooth'});
   const sidebar=document.getElementById('sidebar');
-  if(window.innerWidth<701 && sidebar) sidebar.classList.remove('open');
+  if(window.innerWidth<701&&sidebar)sidebar.classList.remove('open');
 }
 function bind(){
   ensureAnivStructure();
