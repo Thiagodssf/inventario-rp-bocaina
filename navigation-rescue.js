@@ -2,14 +2,14 @@
 function init(){
  const qs=s=>document.querySelector(s);
  const rpSub=qs('#rpSubnav');
- if(rpSub&&!qs('[data-view="aniversariantes"]')){
+ if(rpSub&&!qs('.rp-aniversariantes')){
    const inv=rpSub.querySelector('[data-view="inventory"]');
    const b=document.createElement('button');
-   b.type='button'; b.className='nav rp-aniversariantes'; b.dataset.view='aniversariantes';
+   b.type='button'; b.className='nav rp-aniversariantes'; b.dataset.view='anivDataPanel';
    b.innerHTML='<span class="ico">🎂</span> Aniversariantes';
    if(inv) inv.insertAdjacentElement('afterend',b); else rpSub.prepend(b);
  }
- if(!qs('#aniversariantes')){
+ if(!qs('#aniversariantes')&&!qs('#anivDataPanel')){
    const page=qs('.page');
    if(page){
      const sec=document.createElement('section');
@@ -18,7 +18,6 @@ function init(){
      page.appendChild(sec);
    }
  }
- const views=[...document.querySelectorAll('.view')];
  const show=v=>{const current=[...document.querySelectorAll('.view')];current.forEach(x=>x.classList.toggle('active',x.id===v));document.querySelectorAll('.nav[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===v));if(v==='summary'&&typeof window.renderSummary==='function')window.renderSummary();if(v==='inventory'&&typeof window.renderTable==='function')window.renderTable();};
  document.querySelectorAll('.nav[data-view]').forEach(b=>{b.onclick=e=>{e.preventDefault();e.stopPropagation();show(b.dataset.view)}});
  document.querySelectorAll('.loc-btn').forEach(b=>{b.onclick=e=>{e.preventDefault();e.stopPropagation();const loc=b.dataset.loc;show('inventory');const f=qs('#locationFilter');if(f){f.value=loc;f.dispatchEvent(new Event('change'))}}});
