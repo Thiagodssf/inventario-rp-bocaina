@@ -1,5 +1,2 @@
-const CACHE='bocaina-rp-v29';
-const ASSETS=['./','./index.html','./styles.css','./header-overrides.css','./sidebar-fix.css?v=4','./script.js','./stock.js','./menu-overrides.js','./municiamento-banco.js','./cardapio.js?v=23','./cardapio-etapas-multiplas.js?v=9','./banco-generos-ajuste.js?v=23','./planejamento-semanal.js?v=23','./planejamento-mensal.js?v=9','./despesa-autorizada-banco.js?v=8','./cardapio-layout-final.js?v=4','./cardapio-edit-fix.js?v=2','./nav-fix.js?v=2','./navigation-rescue.js?v=1','./manifest.webmanifest','./brasao-bocaina.png','./Marinhalogo.svg'];
-self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)))});
-self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
-self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;e.respondWith(fetch(e.request).then(r=>{if(r&&r.ok){const copy=r.clone();caches.open(CACHE).then(c=>c.put(e.request,copy)).catch(()=>{});}return r}).catch(()=>caches.match(e.request)))});
+self.addEventListener('install',event=>{self.skipWaiting()});
+self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.map(k=>caches.delete(k)))).then(()=>self.registration.unregister()).then(()=>self.clients.claim()))});
