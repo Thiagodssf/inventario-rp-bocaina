@@ -24,8 +24,9 @@ function activate(tab){
   const nav=stock?.querySelector('.stock-subtabs');
   const content=stock?.querySelector('#stockSubContent');
   if(!nav||!content)return;
+  const panelTab=tab==='mensal'?'semanal':tab;
   nav.querySelectorAll('.stock-subtab').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
-  content.querySelectorAll('.stock-panel').forEach(p=>p.classList.toggle('active',p.dataset.panel===tab));
+  content.querySelectorAll('.stock-panel').forEach(p=>p.classList.toggle('active',p.dataset.panel===panelTab));
 }
 async function ensure(tab){await ensureBase();preparePlanningTabs();for(const key of (dependencies[tab]||[]))await load(key);if(typeof window.initStock==='function')window.initStock();activate(tab)}
 function bind(){
