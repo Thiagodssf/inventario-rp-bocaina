@@ -1,1 +1,1 @@
-(()=>{const add=p=>{const s=document.createElement('script');s.src=p+'?v=3';s.async=false;document.head.appendChild(s)};add('notas-empenho-2024.js');add('notas-empenho-2025.js');add('notas-empenho-2026.js')})();
+(()=>{document.write('<script src="notas-empenho-2024.js?v=3"><\/script><script src="notas-empenho-2025.js?v=3"><\/script><script src="notas-empenho-2026.js?v=3"><\/script>')})();
