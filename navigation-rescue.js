@@ -23,6 +23,9 @@ function init(){
  document.querySelectorAll('.loc-btn').forEach(b=>{b.onclick=e=>{e.preventDefault();e.stopPropagation();const loc=b.dataset.loc;show('inventory');const f=qs('#locationFilter');if(f){f.value=loc;f.dispatchEvent(new Event('change'))}}});
  const mm=qs('#mobileMenu');if(mm)mm.onclick=e=>{e.preventDefault();e.stopPropagation();const s=qs('#sidebar');if(s)s.classList.toggle('open')};
  if(!window.__anivLoaded){window.__anivLoaded=true;const s=document.createElement('script');s.src='aniversariantes-v2.js?v=2';s.defer=true;document.head.appendChild(s);}
+ const adjustAnivSubtitle=()=>{document.querySelectorAll('#anivDataPanel p,#aniversariantes p').forEach(p=>{if(p.closest('.aniv-hero')||p.closest('.section-title'))p.textContent='Militares/ Organizações Militares';});};
+ adjustAnivSubtitle();
+ new MutationObserver(adjustAnivSubtitle).observe(document.body,{childList:true,subtree:true});
  show('inventory');
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
