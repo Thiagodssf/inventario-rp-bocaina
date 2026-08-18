@@ -22,7 +22,6 @@ const snapshot=()=>{
   }
   return data;
 };
-const localHasData=()=>Object.keys(snapshot()).length>0;
 const applySnapshot=data=>{
   suppress=true;
   try{
@@ -33,6 +32,30 @@ const applySnapshot=data=>{
     Object.entries(data||{}).forEach(([k,v])=>localStorage.setItem(k,String(v)));
   }finally{suppress=false;}
   document.dispatchEvent(new Event('bocaina:remote-sync'));
+};
+const mergeCommitment=(localValue,remoteValue)=>{
+  try{
+    const local=JSON.parse(localValue||'[]');
+    const remote=JSON.parse(remoteValue||'[]');
+    if(!Array.isArray(local)||!Array.isArray(remote))return remoteValue||localValue||'[]';
+    const map=new Map();
+    remote.forEach(r=>map.set(String(r.no)+'|'+String(r.ano),r));
+    local.forEach(r=>{
+      const key=String(r.no)+'|'+String(r.ano);
+      if(!map.has(key))map.set(key,r);
+    });
+    return JSON.stringify([...map.values()]);
+  }catch(e){return remoteValue||localValue||'[]'}
+};
+const mergeSnapshots=(local,remote)=>{
+  const merged={...(remote||{})};
+  Object.entries(local||{}).forEach(([k,v])=>{
+    if(!(k in merged)||merged[k]===''||merged[k]===null)merged[k]=v;
+  });
+  if(local?.bocaina_commitment){
+    merged.bocaina_commitment=mergeCommitment(local.bocaina_commitment,remote?.bocaina_commitment);
+  }
+  return merged;
 };
 
 function injectStyle(){
@@ -78,15 +101,19 @@ async function initialSync(){
   const {data:{user}}=await client.auth.getUser();
   if(!user)return;
   status('Sincronizando...','warn');
+  const local=snapshot();
   const {data:row,error}=await client.from(TABLE).select('id,data,updated_at').eq('id',user.id).maybeSingle();
   if(error){status('Banco ainda não configurado','warn');console.error('[Bocaina Sync]',error);return}
   if(!row){
-    await writeRemote(user.id,snapshot());
+    await writeRemote(user.id,local);
     lastRemoteUpdated=new Date().toISOString();
   }else if(row.data&&Object.keys(row.data).length){
-    applySnapshot(row.data);lastRemoteUpdated=row.updated_at||'';
+    const merged=mergeSnapshots(local,row.data);
+    applySnapshot(merged);
+    await writeRemote(user.id,merged);
+    lastRemoteUpdated=row.updated_at||new Date().toISOString();
   }else{
-    await writeRemote(user.id,snapshot());lastRemoteUpdated=new Date().toISOString();
+    await writeRemote(user.id,local);lastRemoteUpdated=new Date().toISOString();
   }
   status('Sincronizado','ok');
   installWatchers();startPolling();
