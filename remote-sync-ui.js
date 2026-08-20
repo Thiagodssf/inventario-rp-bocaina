@@ -4,18 +4,24 @@ document.addEventListener('bocaina:remote-sync',()=>{
   try{window.dispatchEvent(new Event('storage'))}catch(e){console.error('[Bocaina UI Sync]',e)}
 });
 
-// Regra operacional das NEs: enviada para pagamento ou paga = sem crédito.
+// Regra operacional das NEs:
+// enviada para pagamento ou paga = sem crédito;
+// qualquer outro status de pagamento = com crédito.
 function patchSituacaoNE(){
   const rows=document.querySelectorAll('#neRows tr.ne-row');
   rows.forEach(row=>{
     const cells=row.children;
     if(!cells||cells.length<8)return;
-    const pagamento=(cells[6]?.textContent||'').toLowerCase();
+    const pagamento=(cells[6]?.textContent||'').trim().toLowerCase();
     const situacao=cells[7]?.querySelector('.ne-badge');
     if(!situacao)return;
-    if(pagamento.includes('enviado para pagamento')||pagamento.includes('pago')){
+    const semCredito=pagamento.includes('enviado para pagamento')||pagamento.includes('pago');
+    if(semCredito){
       situacao.textContent='Sem crédito';
       situacao.className='ne-badge problema';
+    }else{
+      situacao.textContent='Com crédito';
+      situacao.className='ne-badge ok';
     }
   });
 }
