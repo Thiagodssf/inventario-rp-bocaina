@@ -5,7 +5,7 @@ function patchSituacaoNE(){
   const body=document.getElementById('neRows'); if(!body)return;
   const table=body.closest('table'); if(!table)return;
   const heads=[...table.querySelectorAll('thead th')].map(x=>normalizeStatus(x.textContent));
-  const payIdx=heads.indexOf('pagamento'); const sitIdx=heads.indexOf('situação');
+  const payIdx=heads.indexOf('pagamento'); const sitIdx=heads.indexOf('situacao');
   if(payIdx<0||sitIdx<0)return;
   body.querySelectorAll('tr.ne-row').forEach(row=>{
     const cells=row.children; if(!cells[payIdx]||!cells[sitIdx])return;
