@@ -4,37 +4,33 @@ document.addEventListener('bocaina:remote-sync',()=>{
   try{window.dispatchEvent(new Event('storage'))}catch(e){console.error('[Bocaina UI Sync]',e)}
 });
 
-// Regra operacional das NEs:
-// enviada para pagamento ou paga = sem crédito;
-// qualquer outro status de pagamento = com crédito.
+// Regra operacional das NEs: a situação é derivada do STATUS REAL de pagamento,
+// nunca do texto que já esteja desenhado na coluna Situação.
+function normalizeStatus(value){
+  return String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase().replace(/\s+/g,' ');
+}
 function patchSituacaoNE(){
   const rows=document.querySelectorAll('#neRows tr.ne-row');
   rows.forEach(row=>{
     const cells=row.children;
     if(!cells||cells.length<8)return;
-    const pagamento=(cells[6]?.textContent||'').trim().toLowerCase();
+    const pagamento=normalizeStatus(cells[6]?.textContent);
     const situacao=cells[7]?.querySelector('.ne-badge');
     if(!situacao)return;
-    const semCredito=pagamento.includes('enviado para pagamento')||pagamento.includes('pago');
-    if(semCredito){
-      situacao.textContent='Sem crédito';
-      situacao.className='ne-badge problema';
-    }else{
-      situacao.textContent='Com crédito';
-      situacao.className='ne-badge ok';
-    }
+    const semCredito=pagamento.includes('enviado para pagamento')||pagamento==='pago'||pagamento.includes('pago em');
+    situacao.textContent=semCredito?'Sem crédito':'Com crédito';
+    situacao.className=`ne-badge ${semCredito?'problema':'ok'}`;
   });
 }
 const neObserver=new MutationObserver(()=>patchSituacaoNE());
 function startNEPatch(){
   const body=document.getElementById('neRows');
-  if(body){neObserver.observe(body,{childList:true,subtree:true});patchSituacaoNE();}
+  if(body){neObserver.observe(body,{childList:true,subtree:true,characterData:true});patchSituacaoNE();}
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',startNEPatch);else startNEPatch();
 setInterval(patchSituacaoNE,1000);
 
-// A contagem dos aniversariantes é diária. Se a página permanecer aberta,
-// recarrega automaticamente na virada do dia para recalcular os dias restantes.
+// A contagem dos aniversariantes é diária.
 function watchAniversariantes(){
   let lastDay=new Date().toDateString();
   setInterval(()=>{
