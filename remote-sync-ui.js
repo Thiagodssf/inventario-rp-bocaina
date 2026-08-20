@@ -5,7 +5,7 @@ document.addEventListener('bocaina:remote-sync',()=>{
 });
 
 // Regra operacional das NEs: a situação é derivada do STATUS REAL de pagamento,
-// nunca do texto que já esteja desenhado na coluna Situação.
+// nunca do saldo antigo que tenha sido desenhado na coluna Situação.
 function normalizeStatus(value){
   return String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase().replace(/\s+/g,' ');
 }
@@ -17,7 +17,10 @@ function patchSituacaoNE(){
     const pagamento=normalizeStatus(cells[6]?.textContent);
     const situacao=cells[7]?.querySelector('.ne-badge');
     if(!situacao)return;
-    const semCredito=pagamento.includes('enviado para pagamento')||pagamento==='pago'||pagamento.includes('pago em');
+
+    // Pagamento realizado ou enviado para pagamento = crédito consumido.
+    // Somente pagamento pendente permanece como Com crédito.
+    const semCredito=pagamento.includes('enviado para pagamento') || pagamento==='pago' || pagamento.includes('pago em');
     situacao.textContent=semCredito?'Sem crédito':'Com crédito';
     situacao.className=`ne-badge ${semCredito?'problema':'ok'}`;
   });
