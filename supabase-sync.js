@@ -1,7 +1,7 @@
 (()=>{
 'use strict';
 const SUPABASE_URL='https://kgfcyfdmvbpjdqycmoft.supabase.co';
-const SUPABASE_PUBLISHABLE_KEY='sb_publishable_4ahPTqCNF7A7-ouDYIZ_cSg_9gUjeYK5';
+const SUPABASE_PUBLISHABLE_KEY='sb_publishable_4ahPTqCNF7A-ouDYIZ_cSg_9gUjeYK5';
 const TABLE='app_state';
 const KEYS_PREFIX='bocaina_';
 const EXTRA_KEYS=['bocainaFoods'];
