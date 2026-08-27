@@ -4,41 +4,26 @@ const apply=()=>{
   let s=document.querySelector('#munRestoreLayout');
   if(!s){
     s=document.createElement('style');s.id='munRestoreLayout';
-    s.textContent=`
-/* Correção definitiva: Municiamento respeita a coluna lateral e o cabeçalho original. */
-body.stock-focus .sidebar{display:block!important;visibility:visible!important;opacity:1!important;width:205px!important;position:fixed!important;left:0!important;top:0!important;bottom:0!important}
-body.stock-focus .content{margin-left:205px!important;width:calc(100% - 205px)!important;min-width:0!important}
-body.stock-focus .top{height:118px!important;padding:0 24px!important;background:#08294b!important;box-shadow:0 2px 10px #08294b55!important}
-body.stock-focus .top>*{display:flex!important;visibility:visible!important;opacity:1!important}
-body.stock-focus .top .mobile-menu{display:none!important}
-body.stock-focus .top:after{display:none!important;content:none!important}
-body.stock-focus .page{width:100%!important;max-width:none!important;margin:0!important;padding:14px 24px 28px!important}
-body.stock-focus #stock{width:100%!important;max-width:none!important;margin:0!important;display:block!important;visibility:visible!important}
-body.stock-focus #stock>.section-title{display:flex!important;visibility:visible!important;opacity:1!important}
-body.stock-focus #stock>.stock-subtabs{display:flex!important;visibility:visible!important;opacity:1!important;width:100%!important}
-body.stock-focus #stock>.stock-panel{display:none!important;visibility:hidden!important}
-body.stock-focus #stock>.stock-panel.active{display:block!important;visibility:visible!important;opacity:1!important;width:100%!important}
-body.stock-focus #stock #munDashboard{display:block!important;visibility:visible!important;width:100%!important;max-width:none!important}
-@media(max-width:700px){
- body.stock-focus .sidebar{display:none!important}
- body.stock-focus .content{margin-left:0!important;width:100%!important}
- body.stock-focus .top{height:108px!important;padding:12px 14px 12px 52px!important;display:block!important}
- body.stock-focus .top .mobile-menu{display:block!important}
- body.stock-focus .page{padding:10px!important}
-}
-`;
+    s.textContent=`body.stock-focus .sidebar{display:block!important;visibility:visible!important;opacity:1!important;width:205px!important;position:fixed!important;left:0!important;top:0!important;bottom:0!important}body.stock-focus .content{margin-left:205px!important;width:calc(100% - 205px)!important;min-width:0!important}body.stock-focus .top{height:118px!important;padding:0 24px!important;background:#08294b!important;box-shadow:0 2px 10px #08294b55!important}body.stock-focus .top>*{display:flex!important;visibility:visible!important;opacity:1!important}body.stock-focus .top .mobile-menu{display:none!important}body.stock-focus .top:after{display:none!important;content:none!important}body.stock-focus .page{width:100%!important;max-width:none!important;margin:0!important;padding:14px 24px 28px!important}body.stock-focus #stock{width:100%!important;max-width:none!important;margin:0!important;display:block!important;visibility:visible!important}body.stock-focus #stock>.section-title{display:flex!important;visibility:visible!important;opacity:1!important}body.stock-focus #stock>.stock-subtabs{display:flex!important;visibility:visible!important;opacity:1!important;width:100%!important}body.stock-focus #stock>.stock-panel{display:none!important;visibility:hidden!important}body.stock-focus #stock>.stock-panel.active{display:block!important;visibility:visible!important;opacity:1!important;width:100%!important}body.stock-focus #stock #munDashboard{display:block!important;visibility:visible!important;width:100%!important;max-width:none!important}@media(max-width:700px){body.stock-focus .sidebar{display:none!important}body.stock-focus .content{margin-left:0!important;width:100%!important}body.stock-focus .top{height:108px!important;padding:12px 14px 12px 52px!important;display:block!important}body.stock-focus .top .mobile-menu{display:block!important}body.stock-focus .page{padding:10px!important}}`;
     document.head.appendChild(s);
   }
-  const stock=document.querySelector('#stock');
-  if(!stock)return;
-  const nav=stock.querySelector('.stock-subtabs');
-  if(nav){nav.style.setProperty('display','flex','important');nav.style.setProperty('visibility','visible','important');nav.style.setProperty('opacity','1','important')}
+  const stock=document.querySelector('#stock');if(!stock)return;
+  const nav=stock.querySelector('.stock-subtabs');if(nav){nav.style.setProperty('display','flex','important');nav.style.setProperty('visibility','visible','important');nav.style.setProperty('opacity','1','important')}
   stock.querySelectorAll('.stock-panel').forEach(p=>{const active=p.classList.contains('active');p.style.setProperty('display',active?'block':'none','important');p.style.setProperty('visibility',active?'visible':'hidden','important');p.style.setProperty('opacity',active?'1':'0','important')});
   const sidebar=document.querySelector('.sidebar');if(sidebar){sidebar.style.setProperty('display','block','important');sidebar.style.setProperty('width','205px','important');sidebar.style.setProperty('visibility','visible','important');sidebar.style.setProperty('opacity','1','important')}
   const content=document.querySelector('.content');if(content){content.style.setProperty('margin-left','205px','important');content.style.setProperty('width','calc(100% - 205px)','important')}
   const top=document.querySelector('.top');if(top){top.style.setProperty('height','118px','important');top.style.setProperty('padding','0 24px','important')}
 };
-const boot=()=>{apply();setTimeout(apply,100);setTimeout(apply,500);setTimeout(apply,1200)};
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
-new MutationObserver(()=>apply()).observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['class','style']});
+const boot=()=>{apply();setTimeout(apply,100);setTimeout(apply,500);setTimeout(apply,1200)};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();new MutationObserver(()=>apply()).observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['class','style']});
+
+/* Banco de Gêneros -> Estoque/alertas. Usa os dados já cadastrados na aba Cardápios, sem inventar validade. */
+const norm=s=>String(s??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+const num=v=>{let s=String(v??'').replace(/R\$/g,'').replace(/\s/g,'');if(s.includes(',')&&s.includes('.'))s=s.replace(/\./g,'').replace(',','.');else if(s.includes(','))s=s.replace(',','.');const n=Number(s.replace(/[^0-9.-]/g,''));return Number.isFinite(n)?n:0};
+const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const read=(k,d=[])=>{try{return JSON.parse(localStorage.getItem(k)||JSON.stringify(d))}catch{return d}};const write=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+const col=(heads,tests)=>heads.findIndex(h=>tests.some(t=>norm(h).includes(t)));
+function bankRows(){const panel=document.querySelector('#stock .stock-panel[data-panel="pricebank"]');if(!panel)return[];const table=panel.querySelector('table');if(!table)return[];const heads=[...table.querySelectorAll('thead th')].map(x=>norm(x.textContent));return[...table.querySelectorAll('tbody tr')].map(tr=>{const cells=[...tr.querySelectorAll('td')];if(!cells.length)return null;const button=tr.querySelector('[data-add]');const get=(tests,fb=null)=>{const i=col(heads,tests);return i>=0?(cells[i]?.textContent||'').trim():fb};const name=button?.dataset.add?.trim()||get(['genero','produto','descricao','item'],cells[0]?.textContent?.trim()||'');const unit=get(['unidade','unit'],cells[1]?.textContent?.trim()||'');const q=get(['estoque','quantidade','saldo','atual'],null);const mn=get(['minimo','estoque minimo','min'],null);const price=get(['preco','valor','custo'],null);const expiry=get(['validade','vencimento'],null);const lot=get(['lote'],null);return{name,unit,qty:q===null?null:num(q),min:mn===null?null:num(mn),cost:price===null?0:num(price),expiry:expiry||'',lot:lot||''}}).filter(x=>x&&x.name)}
+function importBank(){const rows=bankRows();if(!rows.length)return false;const current=read('bocainaFoods',[]);const map=new Map(current.map(x=>[norm(x.name||x.description||x.food),x]));rows.forEach(r=>{const key=norm(r.name),old=map.get(key)||{};map.set(key,{...old,name:r.name,unit:r.unit||old.unit||'',qty:r.qty===null?Number(old.qty??old.current_qty??0):r.qty,min:r.min===null?Number(old.min??old.min_qty??0):r.min,cost:r.cost||Number(old.cost??old.unit_cost??old.price??0),category:old.category||'Banco de Gêneros',source:'Banco de Gêneros'})});const foods=[...map.values()];write('bocainaFoods',foods);write('mun_foods',foods.map(x=>({...x,current_qty:x.qty,min_qty:x.min})));const lots=read('mun_lots',[]);const lm=new Map(lots.map(x=>[norm((x.food_name||x.food||x.name)+'|'+(x.lot||'')),x]));rows.filter(r=>r.expiry).forEach(r=>lm.set(norm(r.name+'|'+r.lot),{...(lm.get(norm(r.name+'|'+r.lot))||{}),food:r.name,food_name:r.name,lot:r.lot||'—',qty:r.qty??0,unit:r.unit||'',expiry:r.expiry,source:'Banco de Gêneros'}));write('mun_lots',[...lm.values()]);localStorage.setItem('mun_bank_imported_at',new Date().toISOString());return true}
+function validityNote(){const card=[...document.querySelectorAll('#stock .mdash-card')].find(x=>norm(x.querySelector('.mdash-head h3')?.textContent).includes('proximos do vencimento'));if(!card||card.querySelector('.bank-validity-note'))return;const rows=bankRows();if(!rows.length)return;const noDate=rows.filter(r=>!r.expiry);if(!noDate.length)return;const box=document.createElement('div');box.className='bank-validity-note';box.style.cssText='padding:10px;border-top:1px solid #e5ebf1;background:#fff8e1;color:#6f5200;font-size:9px;line-height:1.45';box.innerHTML='<b>📋 Banco de Gêneros</b><br>'+noDate.length+' gênero(s) estão no banco, mas ainda sem data de validade. Ao informar a validade, o sistema passará a controlar automaticamente este alerta.';const foot=card.querySelector('.mdash-foot');if(foot)foot.before(box);else card.appendChild(box)}
+let last='';setInterval(()=>{const panel=document.querySelector('#stock .stock-panel[data-panel="pricebank"]');const sig=panel?.innerText?.slice(0,10000)||'';if(sig!==last){last=sig;importBank();setTimeout(()=>{try{if(window.munDashboardRender)window.munDashboardRender()}catch{}validityNote()},100)}else validityNote()},1000);if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',importBank);else importBank();
 })();
