@@ -6,37 +6,10 @@ const files={stock:'stock.js?v=24',menu:'menu-overrides.js?v=24',cardapio:'carda
 function load(key){if(loaded.has(key))return Promise.resolve();if(loading.has(key))return loading.get(key);const src=files[key];if(!src)return Promise.resolve();const p=new Promise((resolve,reject)=>{const s=document.createElement('script');s.async=false;s.src=src;s.onload=()=>{loaded.add(key);loading.delete(key);resolve()};s.onerror=()=>{loading.delete(key);console.error('Falha ao carregar '+src);reject(new Error(src))};document.body.appendChild(s)});loading.set(key,p);return p}
 async function ensureBase(){if(stockLoaded)return;await load('stock');await load('fix');stockLoaded=true}
 const dependencies={menu:['menu'],cardapio:['cardapio','etapas','generos','layout','edit'],semanal:['cardapio','semanal'],mensal:['cardapio','semanal','mensal'],expense:['despesa'],military:[],commitment:[],invoice:[]};
-function preparePlanningTabs(){
-  const stock=document.querySelector('#stock');
-  const nav=stock?.querySelector('.stock-subtabs');
-  if(!nav)return;
-  const oldMenu=nav.querySelector('[data-tab="menu"]');
-  if(oldMenu){oldMenu.dataset.tab='cardapio';oldMenu.textContent='🍽️ Cardápios';oldMenu.title='Cadastro e composição de cardápios';}
-  const add=(key,label,icon)=>{
-    if(nav.querySelector(`[data-tab="${key}"]`))return;
-    const b=document.createElement('button');b.type='button';b.className='stock-subtab';b.dataset.tab=key;b.textContent=icon+' '+label;b.title=label;nav.appendChild(b);
-  };
-  add('semanal','Planejamento Semanal','📅');
-  add('mensal','Planejamento Mensal','📊');
-}
-function activate(tab){
-  const stock=document.querySelector('#stock');
-  const nav=stock?.querySelector('.stock-subtabs');
-  const content=stock?.querySelector('#stockSubContent');
-  if(!nav||!content)return;
-  const panelTab=tab==='mensal'?'semanal':tab;
-  nav.querySelectorAll('.stock-subtab').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
-  content.querySelectorAll('.stock-panel').forEach(p=>p.classList.toggle('active',p.dataset.panel===panelTab));
-}
+function preparePlanningTabs(){const stock=document.querySelector('#stock');const nav=stock?.querySelector('.stock-subtabs');if(!nav)return;const oldMenu=nav.querySelector('[data-tab="menu"]');if(oldMenu){oldMenu.dataset.tab='cardapio';oldMenu.textContent='🍽️ Cardápios';oldMenu.title='Cadastro e composição de cardápios'}const add=(key,label,icon)=>{if(nav.querySelector(`[data-tab="${key}"]`))return;const b=document.createElement('button');b.type='button';b.className='stock-subtab';b.dataset.tab=key;b.textContent=icon+' '+label;b.title=label;nav.appendChild(b)};add('semanal','Planejamento Semanal','📅');add('mensal','Planejamento Mensal','📊')}
+function activate(tab){const stock=document.querySelector('#stock');const nav=stock?.querySelector('.stock-subtabs');const content=stock?.querySelector('#stockSubContent');if(!nav||!content)return;const panelTab=tab==='mensal'?'semanal':tab;nav.querySelectorAll('.stock-subtab').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));content.querySelectorAll('.stock-panel').forEach(p=>p.classList.toggle('active',p.dataset.panel===panelTab))}
 async function ensure(tab){await ensureBase();preparePlanningTabs();for(const key of (dependencies[tab]||[]))await load(key);if(typeof window.initStock==='function')window.initStock();activate(tab)}
-function bind(){
-  document.addEventListener('click',e=>{
-    const main=e.target.closest('.nav[data-view="stock"]');
-    if(main){ensureBase().then(preparePlanningTabs).catch(()=>{});return;}
-    const sub=e.target.closest('.stock-subtab[data-tab]');
-    if(sub){ensure(sub.dataset.tab).catch(()=>{});}
-  },true);
-  ensureBase().then(preparePlanningTabs).catch(()=>{});
-}
+function restoreMuniciamento(){const stock=document.querySelector('#stock');if(!stock)return;const nav=stock.querySelector('.stock-subtabs');if(nav){nav.style.setProperty('display','flex','important');nav.style.setProperty('visibility','visible','important');nav.style.setProperty('opacity','1','important')}stock.querySelectorAll('.stock-panel').forEach(p=>{p.style.setProperty('visibility',p.classList.contains('active')?'visible':'hidden','important');p.style.setProperty('display',p.classList.contains('active')?'block':'none','important')});const sidebar=document.querySelector('.sidebar');if(sidebar)sidebar.style.setProperty('display','flex','important');const content=document.querySelector('.content');if(content)content.style.setProperty('margin-left','175px','important');const top=document.querySelector('.top');if(top){top.style.setProperty('height','auto','important');top.style.setProperty('padding','0','important')}const pseudoFix=document.querySelector('#munDashboard');if(pseudoFix)pseudoFix.style.setProperty('display','block','important')}
+function bind(){document.addEventListener('click',e=>{const main=e.target.closest('.nav[data-view="stock"]');if(main){ensureBase().then(preparePlanningTabs).then(()=>setTimeout(restoreMuniciamento,0)).catch(()=>{});return}const sub=e.target.closest('.stock-subtab[data-tab]');if(sub){ensure(sub.dataset.tab).then(()=>setTimeout(restoreMuniciamento,0)).catch(()=>{})}},true);ensureBase().then(preparePlanningTabs).then(()=>setTimeout(restoreMuniciamento,0)).catch(()=>{});setTimeout(restoreMuniciamento,500);setTimeout(restoreMuniciamento,1500)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind);else bind();
 })();
