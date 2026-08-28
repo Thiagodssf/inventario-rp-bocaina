@@ -8,14 +8,15 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&
 const read=(k,d=[])=>{try{return JSON.parse(localStorage.getItem(k)||JSON.stringify(d))}catch{return d}};
 const write=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 function sync(){
+ const deleted=new Set(read('mun_deleted_genres',[]).map(norm));
  const old=read('bocainaFoods',[]);const map=new Map(old.map(x=>[norm(x.name||x.description||x.food),x]));
- BANK.forEach(([name,unit,cost])=>{const k=norm(name),x=map.get(k)||{};map.set(k,{...x,name,unit:x.unit||unit,qty:Number(x.qty??x.current_qty??0),min:Number(x.min??x.min_qty??0),cost:Number(x.cost??x.unit_cost??x.price??cost),category:x.category||'Banco de Gêneros',source:'Banco de Gêneros'});});
- const foods=BANK.map(([name])=>map.get(norm(name))).filter(Boolean);const extras=[...map.values()].filter(x=>!BANK.some(b=>norm(b[0])===norm(x.name||'')));const merged=[...foods,...extras];
- write('bocainaFoods',merged);write('mun_foods',merged.map(x=>({...x,current_qty:Number(x.qty||0),min_qty:Number(x.min||0)})));localStorage.setItem('mun_bank_master_version','1');localStorage.setItem('mun_bank_master_at',new Date().toISOString());
+ BANK.forEach(([name,unit,cost])=>{if(deleted.has(norm(name)))return;const k=norm(name),x=map.get(k)||{};map.set(k,{...x,name,unit:x.unit||unit,qty:Number(x.qty??x.current_qty??0),min:Number(x.min??x.min_qty??0),cost:Number(x.cost??x.unit_cost??x.price??cost),category:x.category||'Banco de Gêneros',source:'Banco de Gêneros'});});
+ const foods=BANK.map(([name])=>map.get(norm(name))).filter(Boolean).filter(x=>!deleted.has(norm(x.name)));const extras=[...map.values()].filter(x=>!BANK.some(b=>norm(b[0])===norm(x.name||''))&&!deleted.has(norm(x.name)));const merged=[...foods,...extras];
+ write('bocainaFoods',merged);write('mun_foods',merged.map(x=>({...x,current_qty:Number(x.qty||0),min_qty:Number(x.min||0)})));localStorage.setItem('mun_bank_master_version','2');localStorage.setItem('mun_bank_master_at',new Date().toISOString());
  refreshFoods();try{window.dispatchEvent(new CustomEvent('municiamento:bank-updated',{detail:{count:foods.length}}));document.body.classList.toggle('mun-bank-refresh');}catch{}
 }
 function refreshFoods(){
- const panel=document.querySelector('#stock .stock-panel[data-panel="foods"]');if(!panel)return;const foods=read('bocainaFoods',[]);const low=foods.filter(x=>Number(x.min||0)>0&&Number(x.qty||0)<Number(x.min||0));const total=foods.reduce((s,x)=>s+Number(x.qty||0),0);
+ const panel=document.querySelector('#stock .stock-panel[data-panel="foods"]');if(!panel)return;const deleted=new Set(read('deleted_genres',[]).map(norm));const foods=read('bocainaFoods',[]).filter(x=>!deleted.has(norm(x.name)));const low=foods.filter(x=>Number(x.min||0)>0&&Number(x.qty||0)<Number(x.min||0));const total=foods.reduce((s,x)=>s+Number(x.qty||0),0);
  const count=panel.querySelector('#gCount'),l=panel.querySelector('#gLow'),t=panel.querySelector('#gTotal'),d=panel.querySelector('#gDate'),list=panel.querySelector('#gList');if(count)count.textContent=foods.length;if(l)l.textContent=low.length;if(t)t.textContent=total.toLocaleString('pt-BR');if(d)d.textContent=foods.length?new Date().toLocaleDateString('pt-BR'):'—';
  if(list)list.innerHTML=`<div class="stock-table-box"><table class="stock-table2"><thead><tr><th>Gênero</th><th>Unidade</th><th>Atual</th><th>Mínimo</th><th>Preço</th><th>Status</th></tr></thead><tbody>${foods.map(x=>{const q=Number(x.qty||0),m=Number(x.min||0),critical=m>0&&q<m;return`<tr><td>${esc(x.name)}</td><td>${esc(x.unit)}</td><td>${q}</td><td>${m||'—'}</td><td>${Number(x.cost||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</td><td class="${critical?'stock-bad':'stock-ok'}">${critical?'REPOR':'NORMAL'}</td></tr>`}).join('')}</tbody></table></div>`;
 }
