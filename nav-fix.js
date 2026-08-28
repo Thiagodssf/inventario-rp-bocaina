@@ -5,7 +5,7 @@ function ensureAnivStructure(){
   if(!rpSub.querySelector('.rp-aniversariantes')){const b=document.createElement('button');b.type='button';b.className='nav rp-aniversariantes';b.dataset.view='aniversariantes';b.innerHTML='<span class="ico">🎂</span> Aniversariantes';const inv=rpSub.querySelector('[data-view="inventory"]');if(inv)inv.insertAdjacentElement('afterend',b);else rpSub.prepend(b)}
   if(!document.getElementById('aniversariantes')){const page=document.querySelector('.page');if(page){const sec=document.createElement('section');sec.id='aniversariantes';sec.className='view';sec.innerHTML='<div class="section-title"><div><span class="section-icon">🎂</span><h2>ANIVERSARIANTES</h2><p>Militares/ Organizações Militares</p></div></div>';page.appendChild(sec)}}
 }
-function loadAniv(){if(window.__anivLoaded)return;window.__anivLoaded=true;const s=document.createElement('script');s.src='aniversariantes-v2.js?v=4';s.async=false;s.onerror=()=>{window.__anivLoaded=false};document.body.appendChild(s)}
+function loadAniv(){if(window.__anivLoaded)return;window.__anivLoaded=true;const s=document.createElement('script');s.src='aniversariantes-v2.js?v=5';s.async=false;s.onerror=()=>{window.__anivLoaded=false};document.body.appendChild(s)}
 function loadInventoryManagement(){if(window.__invMgmtLoaded)return;window.__invMgmtLoaded=true;const s=document.createElement('script');s.src='inventario-gestao-v2.js?v=2';s.async=false;s.onerror=()=>{window.__invMgmtLoaded=false};document.body.appendChild(s)}
 function activate(view){
   if(view==='agenda'){
@@ -36,5 +36,5 @@ function bind(){
   if(document.getElementById('inventory'))loadInventoryManagement();
 }
 function agendaDelegation(e){const b=e.target.closest?.('.nav[data-view="agenda"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();activate('agenda')}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind);else bind();setTimeout(bind,500);document.addEventListener('click',agendaDelegation,true);
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind);else bind();setTimeout(bind,500);setTimeout(bind,1500);document.addEventListener('click',agendaDelegation,true);
 })();
