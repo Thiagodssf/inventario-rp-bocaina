@@ -3,27 +3,19 @@ const q=s=>document.querySelector(s);
 function clean(){
   const panel=q('.stock-panel[data-panel="expense"]');
   if(!panel)return false;
-
-  // Mantém as duas janelas novas que o usuário quer:
-  // 1) Cálculo da Despesa Autorizada (#daDailyCalc)
-  // 2) Resumo da Despesa Autorizada (criado pelo resumo mensal)
-  //
-  // Remove SOMENTE os blocos antigos/duplicados dentro de .da-bottom:
-  // Banco de Valores e o cálculo antigo Tipo/Militares/Dias.
-  const bottom=panel.querySelector('.da-v3 .da-bottom');
+  const root=panel.querySelector('.da-v3');
+  if(!root)return false;
+  const bottom=root.querySelector('.da-bottom');
   if(bottom){
-    bottom.style.display='block';
+    bottom.style.display='grid';
     Array.from(bottom.children).forEach(child=>{
-      if(child.id==='daDailyCalc') child.style.display='block';
-      else child.style.display='none';
+      const keep=child.id==='daDailyCalc' || child===bottom.children[0];
+      child.style.setProperty('display',keep?'block':'none','important');
     });
   }
-
-  // Segurança: se algum cálculo legado for criado fora do .da-bottom,
-  // esconde somente o bloco que contém os controles antigos.
-  panel.querySelectorAll('.da-v3 .da-calc-form,.da-v3 .da-calc-table').forEach(el=>{
-    const legacy=el.closest('.da-box');
-    if(legacy && legacy.id!=='daDailyCalc')legacy.style.display='none';
+  root.querySelectorAll('.da-calc-form,.da-calc-table').forEach(el=>{
+    const box=el.closest('.da-box');
+    if(box && box.id!=='daDailyCalc')box.style.setProperty('display','none','important');
   });
   return true;
 }
