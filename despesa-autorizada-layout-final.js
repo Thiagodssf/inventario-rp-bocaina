@@ -1,7 +1,14 @@
 (()=>{'use strict';
 const q=s=>document.querySelector(s);
-function css(){if(q('#daFinalLayoutCss'))return;const s=document.createElement('style');s.id='daFinalLayoutCss';s.textContent=`.da-v3 .da-bottom{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:12px!important}.da-v3 .da-bottom>.da-box:nth-child(2){display:none!important}.da-v3 .da-bottom>#daDailyCalc{display:block!important;grid-column:2!important;grid-row:1!important}.da-v3 .da-bottom>.da-box:first-child{grid-column:1!important;grid-row:1!important}.da-v3 #daDailyCalc{width:100%!important;margin:0!important}.da-v3 .da-bottom>#daDailyCalc .dd-form{display:grid!important}.da-v3 .da-bottom>#daDailyCalc .dd-total{display:flex!important}.da-v3 .da-bottom>#daDailyCalc .dd-grid{display:grid!important}@media(max-width:950px){.da-v3 .da-bottom{grid-template-columns:1fr!important}.da-v3 .da-bottom>#daDailyCalc{grid-column:1!important;grid-row:2!important}.da-v3 .da-bottom>.da-box:first-child{grid-column:1!important;grid-row:1!important}}`;document.head.appendChild(s)}
-function apply(){const panel=q('.stock-panel[data-panel="expense"]');if(!panel)return false;const root=panel.querySelector('.da-v3');if(!root)return false;css();const bottom=root.querySelector('.da-bottom');if(!bottom)return false;const oldCalc=bottom.children[1];if(oldCalc)oldCalc.style.setProperty('display','none','important');const daily=bottom.querySelector('#daDailyCalc');if(daily){daily.style.setProperty('display','block','important');bottom.appendChild(daily)}return true}
+function apply(){
+  const panel=q('.stock-panel[data-panel="expense"]');
+  if(!panel)return false;
+  const root=panel.querySelector('.da-v3');
+  if(!root)return false;
+  const bottom=root.querySelector('.da-bottom');
+  if(bottom) bottom.style.setProperty('display','none','important');
+  return true;
+}
 function wait(){if(!apply())setTimeout(wait,250);else setTimeout(apply,500)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',wait);else wait();
 new MutationObserver(()=>setTimeout(apply,50)).observe(document.body,{childList:true,subtree:true});
