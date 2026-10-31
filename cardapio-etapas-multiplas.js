@@ -35,8 +35,10 @@ function install(){
    const authorized=stages.reduce((s,x)=>s+x[1],0)*military;
    const d=get();
    const idx=Number.isInteger(window.__editingMenuIndex)?window.__editingMenuIndex:-1;
+   const previousRecord=idx>=0&&d[idx]?d[idx]:null;
+   const oldItems=previousRecord?.items||[];
    const record={name,meal:'vale-diario',mealLabel:'Vale diário',stages:stages.map(x=>x[0]),stageValues:stages.map(x=>x[1]),stage:stages[0][0],stageValue:stages[0][1],military,militaryCount:military,authorizedExpense:authorized,items,total,updated:new Date().toISOString()};
-   if(idx>=0 && d[idx]) d[idx]={...d[idx],...record}; else d.push({...record,created:new Date().toISOString()});
+   if(previousRecord) d[idx]={...previousRecord,...record}; else d.push({...record,created:new Date().toISOString()});
    try {
      // Integração transacional: o vale consome o saldo do Estoque de Gêneros.
      const norm=s=>String(s??'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase().replace(/\\s+/g,' ').trim();
@@ -44,7 +46,6 @@ function install(){
      const stock=JSON.parse(localStorage.getItem(stockKey)||'[]');
      const mirror=JSON.parse(localStorage.getItem(mirrorKey)||'[]');
      if(!Array.isArray(stock)||!stock.length) throw new Error('O Estoque de Gêneros está vazio ou não foi carregado. Cadastre os gêneros antes de salvar o vale.');
-     const oldItems=idx>=0&&d[idx]?d[idx].items||[]:[];
      const aggregate=arr=>{const map=new Map();(arr||[]).forEach(x=>{const k=norm(x.name);if(k)map.set(k,(map.get(k)||0)+Number(x.qty||0))});return map};
      const before=aggregate(oldItems),after=aggregate(items),changes=[];
      const names=new Map();[...oldItems,...items].forEach(x=>names.set(norm(x.name),x.name));
