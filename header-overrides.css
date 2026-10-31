@@ -18,3 +18,7 @@
 @media(orientation:landscape) and (max-width:900px){.top{height:92px!important;min-height:92px!important}.header-ship{height:92px}.content{padding-top:0!important}.page{padding-top:8px!important}.sidebar{width:min(300px,70vw)!important}}
 .stock-panel[data-panel="menu"] .stock-kpi:nth-child(2) span{font-size:0}.stock-panel[data-panel="menu"] .stock-kpi:nth-child(2) span:after{content:"VALOR SEMANAL";font-size:9px}.stock-panel[data-panel="menu"] .stock-kpi:nth-child(3) span{font-size:0}.stock-panel[data-panel="menu"] .stock-kpi:nth-child(3) span:after{content:"VALOR MENSAL";font-size:9px}.stock-panel[data-panel="menu"] .stock-form label:has(#menu_people),.stock-panel[data-panel="menu"] .stock-form label:has(#menu_unit){display:none}.stock-panel[data-panel="menu"] .stock-table2 th:nth-child(3),.stock-panel[data-panel="menu"] .stock-table2 td:nth-child(3),.stock-panel[data-panel="menu"] .stock-table2 th:nth-child(4),.stock-panel[data-panel="menu"] .stock-table2 td:nth-child(4){display:none}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%;overflow-x:hidden}body{overflow-x:hidden;-webkit-tap-highlight-color:transparent}button,input,select,textarea{font:inherit}
+/* Simplificar a entrada do Municiamento: ocultar cabeçalho interno e barra de atalhos. */
+body.stock-focus #stock > .section-title,
+body.stock-focus #mpBar,
+body.stock-focus #mpToolbar {display:none!important;}
