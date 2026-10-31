@@ -28,6 +28,14 @@ function init(){
  const s=document.getElementById('rpSubnav');
  if(!p||!s||p.dataset.rpBound==='1')return;
  p.dataset.rpBound='1';
+ const desktop=window.matchMedia('(hover:hover) and (min-width:701px)');
+ const show=()=>{if(desktop.matches){s.classList.add('open');s.classList.remove('collapsed');p.classList.add('open');p.setAttribute('aria-expanded','true')}};
+ const hide=()=>{if(desktop.matches){s.classList.remove('open');p.classList.remove('open');p.setAttribute('aria-expanded','false')}};
+ p.addEventListener('pointerenter',show);
+ s.addEventListener('pointerenter',show);
+ p.addEventListener('pointerleave',e=>{if(!s.contains(e.relatedTarget))hide()});
+ s.addEventListener('pointerleave',e=>{if(!p.contains(e.relatedTarget))hide()});
+
  p.addEventListener('click',e=>{e.preventDefault();const open=s.classList.toggle('collapsed')===false;p.classList.toggle('open',open);p.setAttribute('aria-expanded',String(open));});
  document.addEventListener('click',e=>{const v=e.target.closest('.nav[data-view="inventory"]');if(v){s.classList.remove('collapsed');p.classList.add('open');p.setAttribute('aria-expanded','true');}});
 }
