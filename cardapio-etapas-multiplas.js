@@ -42,10 +42,11 @@ function install(){
    try {
      // Integração transacional: o vale consome o saldo do Estoque de Gêneros.
      const norm=s=>String(s??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/\s+/g,' ').trim();
+     // bocainaFoods é a fonte canônica exibida pelo Banco Mestre; mun_foods é apenas o espelho operacional.
      const stockKey='mun_foods', mirrorKey='bocainaFoods', movesKey='mun_moves';
-     const stock=JSON.parse(localStorage.getItem(stockKey)||'[]');
      const mirror=JSON.parse(localStorage.getItem(mirrorKey)||'[]');
-     if(!Array.isArray(stock)||!stock.length) throw new Error('O Estoque de Gêneros está vazio ou não foi carregado. Cadastre os gêneros antes de salvar o vale.');
+     if(!Array.isArray(mirror)||!mirror.length) throw new Error('O Estoque de Gêneros está vazio ou não foi carregado. Cadastre os gêneros antes de salvar o vale.');
+     const stock=mirror.map(x=>({...x,qty:Number(x.qty??x.current_qty??0),current_qty:Number(x.qty??x.current_qty??0)}));
      const aggregate=arr=>{const map=new Map();(arr||[]).forEach(x=>{const k=norm(x.name);if(k)map.set(k,(map.get(k)||0)+Number(x.qty||0))});return map};
      const before=aggregate(oldItems),after=aggregate(items),changes=[];
      const names=new Map();[...oldItems,...items].forEach(x=>names.set(norm(x.name),x.name));
@@ -74,14 +75,16 @@ function install(){
      const keys=[stockKey,mirrorKey,movesKey,'bocaina_menus'];
      const backup=Object.fromEntries(keys.map(k=>[k,localStorage.getItem(k)]));
      try{
-       localStorage.setItem(stockKey,JSON.stringify(stock));
-       localStorage.setItem(mirrorKey,JSON.stringify(mirror));
+       // Grava primeiro a fonte canônica, depois o espelho usado pela tela operacional.
+       localStorage.setItem(mirrorKey,JSON.stringify(stock));
+       localStorage.setItem(stockKey,JSON.stringify(stock.map(x=>({...x,current_qty:Number(x.qty||0),min_qty:Number(x.min||0)}))));
        localStorage.setItem(movesKey,JSON.stringify(history));
        put(d);
      }catch(writeError){
        keys.forEach(k=>backup[k]===null?localStorage.removeItem(k):localStorage.setItem(k,backup[k]));
        throw writeError;
      }
+     try{window.municiamentoRefreshFoods?.();}catch(refreshError){console.warn('Atualização visual do estoque:',refreshError)}
      window.dispatchEvent(new CustomEvent('municiamento:food-updated',{detail:{source:'vale',items:changes}}));
      document.dispatchEvent(new Event('bocaina:menus-updated'));
      const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
