@@ -6,7 +6,7 @@ function ensureAnivStructure(){
   if(!document.getElementById('aniversariantes')){const page=document.querySelector('.page');if(page){const sec=document.createElement('section');sec.id='aniversariantes';sec.className='view';sec.innerHTML='<div class="section-title"><div><span class="section-icon">🎂</span><h2>ANIVERSARIANTES</h2><p>Militares/ Organizações Militares</p></div></div>';page.appendChild(sec)}}
 }
 function loadAniv(){if(window.__anivLoaded)return;window.__anivLoaded=true;const s=document.createElement('script');s.src='aniversariantes-v2.js?v=5';s.async=false;s.onerror=()=>{window.__anivLoaded=false};document.body.appendChild(s)}
-function loadInventoryManagement(){if(window.__invMgmtLoaded)return;window.__invMgmtLoaded=true;const s=document.createElement('script');s.src='inventario-gestao-v2.js?v=2';s.async=false;s.onerror=()=>{window.__invMgmtLoaded=false};document.body.appendChild(s)}
+function loadInventoryManagement(){if(window.__invMgmtLoaded)return;window.__invMgmtLoaded=true;const s=document.createElement('script');s.src='inventario-gestao-v2.js?v=3';s.async=false;s.onerror=()=>{window.__invMgmtLoaded=false};document.body.appendChild(s)}
 function activate(view){
   if(view==='agenda'){
     if(typeof window.initAgendaAdministrativa==='function')window.initAgendaAdministrativa();
