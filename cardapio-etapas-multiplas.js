@@ -41,7 +41,7 @@ function install(){
    if(previousRecord) d[idx]={...previousRecord,...record}; else d.push({...record,created:new Date().toISOString()});
    try {
      // Integração transacional: o vale consome o saldo do Estoque de Gêneros.
-     const norm=s=>String(s??'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase().replace(/\\s+/g,' ').trim();
+     const norm=s=>String(s??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/\s+/g,' ').trim();
      const stockKey='mun_foods', mirrorKey='bocainaFoods', movesKey='mun_moves';
      const stock=JSON.parse(localStorage.getItem(stockKey)||'[]');
      const mirror=JSON.parse(localStorage.getItem(mirrorKey)||'[]');
