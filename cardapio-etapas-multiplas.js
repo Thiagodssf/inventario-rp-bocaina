@@ -38,7 +38,50 @@ function install(){
    const record={name,meal:'vale-diario',mealLabel:'Vale diário',stages:stages.map(x=>x[0]),stageValues:stages.map(x=>x[1]),stage:stages[0][0],stageValue:stages[0][1],military,militaryCount:military,authorizedExpense:authorized,items,total,updated:new Date().toISOString()};
    if(idx>=0 && d[idx]) d[idx]={...d[idx],...record}; else d.push({...record,created:new Date().toISOString()});
    try {
-     put(d);
+     // Integração transacional: o vale consome o saldo do Estoque de Gêneros.
+     const norm=s=>String(s??'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase().replace(/\\s+/g,' ').trim();
+     const stockKey='mun_foods', mirrorKey='bocainaFoods', movesKey='mun_moves';
+     const stock=JSON.parse(localStorage.getItem(stockKey)||'[]');
+     const mirror=JSON.parse(localStorage.getItem(mirrorKey)||'[]');
+     if(!Array.isArray(stock)||!stock.length) throw new Error('O Estoque de Gêneros está vazio ou não foi carregado. Cadastre os gêneros antes de salvar o vale.');
+     const oldItems=idx>=0&&d[idx]?d[idx].items||[]:[];
+     const aggregate=arr=>{const map=new Map();(arr||[]).forEach(x=>{const k=norm(x.name);if(k)map.set(k,(map.get(k)||0)+Number(x.qty||0))});return map};
+     const before=aggregate(oldItems),after=aggregate(items),changes=[];
+     const names=new Map();[...oldItems,...items].forEach(x=>names.set(norm(x.name),x.name));
+     for(const [key,label] of names){
+       const delta=(after.get(key)||0)-(before.get(key)||0);
+       if(Math.abs(delta)<0.0000001) continue;
+       const si=stock.findIndex(x=>norm(x.name)===key);
+       if(si<0) throw new Error('O gênero "'+label+'" não foi encontrado no Estoque de Gêneros. Confira o cadastro antes de salvar.');
+       const unit=items.find(x=>norm(x.name)===key)?.unit||oldItems.find(x=>norm(x.name)===key)?.unit||'';
+       const stockUnit=stock[si].unit||'';
+       if(unit&&stockUnit&&norm(unit)!==norm(stockUnit)) throw new Error('Unidade diferente para "'+label+'": no vale está "'+unit+'" e no estoque "'+stockUnit+'".');
+       const current=Number(stock[si].qty??stock[si].current_qty??0);
+       if(delta>0&&current+0.0000001<delta) throw new Error('Estoque insuficiente para "'+label+'". Disponível: '+current+' '+stockUnit+'; necessário: '+delta+' '+(stockUnit||unit)+'.');
+       changes.push({key,label,si,delta,before:current,after:current-delta,unit:stockUnit||unit});
+     }
+     const now=new Date().toISOString();
+     changes.forEach(ch=>{
+       stock[ch.si]={...stock[ch.si],qty:ch.after,current_qty:ch.after};
+       const mi=mirror.findIndex(x=>norm(x.name)===ch.key);
+       if(mi>=0) mirror[mi]={...mirror[mi],qty:ch.after,current_qty:ch.after};
+       else mirror.push({...stock[ch.si],qty:ch.after,current_qty:ch.after});
+     });
+     const history=JSON.parse(localStorage.getItem(movesKey)||'[]');
+     changes.forEach(ch=>history.unshift({id:crypto.randomUUID?crypto.randomUUID():String(Date.now())+'-'+Math.random(),food:ch.label,type:ch.delta>0?'saida':'entrada',qty:Math.abs(ch.delta),before:ch.before,after:ch.after,date:now.slice(0,10),at:now,user:localStorage.getItem('bocaina_usuario')||'Usuário',obs:(ch.delta>0?'Consumo':'Estorno por edição')+' do vale: '+name}));
+     // Grave saldo, espelho, histórico e vale; se ocorrer falha, restaure as chaves anteriores.
+     const keys=[stockKey,mirrorKey,movesKey,'bocaina_menus'];
+     const backup=Object.fromEntries(keys.map(k=>[k,localStorage.getItem(k)]));
+     try{
+       localStorage.setItem(stockKey,JSON.stringify(stock));
+       localStorage.setItem(mirrorKey,JSON.stringify(mirror));
+       localStorage.setItem(movesKey,JSON.stringify(history));
+       put(d);
+     }catch(writeError){
+       keys.forEach(k=>backup[k]===null?localStorage.removeItem(k):localStorage.setItem(k,backup[k]));
+       throw writeError;
+     }
+     window.dispatchEvent(new CustomEvent('municiamento:food-updated',{detail:{source:'vale',items:changes}}));
      document.dispatchEvent(new Event('bocaina:menus-updated'));
      const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
      const money=v=>Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
