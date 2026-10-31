@@ -20,4 +20,4 @@ function openLocation(loc){show('inventory');$('#locationFilter').value=loc;rend
 document.querySelectorAll('.nav').forEach(b=>b.onclick=()=>show(b.dataset.view));
 $('#locationFilter').onchange=renderTable;$('#typeFilter').onchange=renderTable;$('#search').oninput=renderTable;
 $('#mobileMenu').onclick=()=>$('#sidebar').classList.toggle('open');
-renderNav();renderFilters();renderTable();renderSummary();renderLocations();window.addEventListener('bocaina:remote-sync',()=>{renderTable();renderSummary();renderLocations()});
+renderNav();renderFilters();renderTable();renderSummary();renderLocations();window.addEventListener('bocaina:remote-sync',event=>{try{const raw=event.detail?.inventory;if(raw){const remote=JSON.parse(raw);if(Array.isArray(remote)){const byId=new Map(remote.map(v=>[Number(v.id),v]));items.forEach(x=>{const v=byId.get(Number(x.id));if(v&&v.quantity!==undefined)x.quantity=v.quantity});localStorage.setItem(INVENTORY_KEY,JSON.stringify(items))}}}catch(error){console.error('Falha ao aplicar inventário recebido da nuvem:',error)}renderTable();renderSummary();renderLocations()});
