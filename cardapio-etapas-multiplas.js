@@ -99,6 +99,53 @@ function install(){
    }
    catch(err){ console.error(err); alert('Não foi possível salvar o vale: '+(err.message||err)); }
  };
+
+ // Exclusão persistente do vale, com devolução do consumo ao estoque.
+ document.addEventListener('click',function deleteVale(e){
+   const btn=e.target.closest('[data-delmenu]');
+   if(!btn)return;
+   e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
+   const index=Number(btn.dataset.delmenu);
+   const menus=get();
+   const menu=menus[index];
+   if(!menu)return;
+   if(!confirm('Excluir o vale "'+(menu.name||'')+'" e devolver os gêneros ao estoque?'))return;
+   const norm=s=>String(s??'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase().replace(/\\s+/g,' ').trim();
+   const stockKey='mun_foods',mirrorKey='bocainaFoods',movesKey='mun_moves';
+   const stock=JSON.parse(localStorage.getItem(stockKey)||'[]');
+   const mirror=JSON.parse(localStorage.getItem(mirrorKey)||'[]');
+   const history=JSON.parse(localStorage.getItem(movesKey)||'[]');
+   const now=new Date().toISOString();
+   for(const item of (menu.items||[])){
+     const key=norm(item.name);
+     const si=stock.findIndex(x=>norm(x.name)===key);
+     if(si<0)throw new Error('Gênero não encontrado no estoque: '+item.name);
+     const amount=Number(item.qty||0);
+     const current=Number(stock[si].qty??stock[si].current_qty??0);
+     const next=current+amount;
+     stock[si]={...stock[si],qty:next,current_qty:next};
+     const mi=mirror.findIndex(x=>norm(x.name)===key);
+     if(mi>=0)mirror[mi]={...mirror[mi],qty:next,current_qty:next};
+     else mirror.push({...stock[si],qty:next,current_qty:next});
+     history.unshift({id:crypto.randomUUID?crypto.randomUUID():String(Date.now())+'-'+Math.random(),food:item.name,type:'entrada',qty:amount,before:current,after:next,date:now.slice(0,10),at:now,user:localStorage.getItem('bocaina_usuario')||'Usuário',obs:'Estorno pela exclusão do vale: '+(menu.name||'Vale')});
+   }
+   menus.splice(index,1);
+   localStorage.setItem(stockKey,JSON.stringify(stock));
+   localStorage.setItem(mirrorKey,JSON.stringify(mirror));
+   localStorage.setItem(movesKey,JSON.stringify(history));
+   put(menus);
+   if(Number.isInteger(window.__editingMenuIndex)){
+     if(window.__editingMenuIndex===index)window.__editingMenuIndex=undefined;
+     else if(window.__editingMenuIndex>index)window.__editingMenuIndex--;
+   }
+   const box=$('#savedMenus');
+   if(box)box.innerHTML=menus.length?menus.map((m,i)=>{
+     const items=(m.items||[]).map(x=>'<div>✓ '+String(x.name)+' — '+x.qty+' '+String(x.unit||'')+'</div>').join('');
+     return '<div style="border:1px solid #d4e0eb;border-radius:7px;padding:9px;margin-bottom:7px"><b>'+String(m.name||'Vale')+'</b><span style="float:right"><button class="saved-menu-edit" data-editmenu="'+i+'">Editar</button><button class="stock-del" data-delmenu="'+i+'">Excluir</button></span><div class="saved-menu-items">'+items+'</div></div>';
+   }).join(''):'<div class="builder-empty">Nenhum vale salvo.</div>';
+   window.dispatchEvent(new CustomEvent('municiamento:food-updated',{detail:{source:'vale-delete'}}));
+   document.dispatchEvent(new Event('bocaina:menus-updated'));
+ },true);
  save.addEventListener('click',saveVale,true);
  return true;
 }
