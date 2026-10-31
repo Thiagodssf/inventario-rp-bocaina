@@ -20,4 +20,4 @@ function openLocation(loc){show('inventory');$('#locationFilter').value=loc;rend
 document.querySelectorAll('.nav').forEach(b=>b.onclick=()=>show(b.dataset.view));
 $('#locationFilter').onchange=renderTable;$('#typeFilter').onchange=renderTable;$('#search').oninput=renderTable;
 $('#mobileMenu').onclick=()=>$('#sidebar').classList.toggle('open');
-renderNav();renderFilters();renderTable();renderSummary();renderLocations();
+renderNav();renderFilters();renderTable();renderSummary();renderLocations();window.addEventListener('bocaina:remote-sync',()=>{renderTable();renderSummary();renderLocations()});
