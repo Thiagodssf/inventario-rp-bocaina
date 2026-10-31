@@ -22,3 +22,13 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;overflow-x:hidden}body{
 body.stock-focus #stock > .section-title,
 body.stock-focus #mpBar,
 body.stock-focus #mpToolbar {display:none!important;}
+
+/* Ocultar abas administrativas não utilizadas no Municiamento; dados permanecem preservados. */
+#stock .stock-subtabs > [data-tab="military"],
+#stock .stock-subtabs > [data-tab="invoice"],
+#stock .stock-subtabs > [data-tab="semanal"],
+#stock .stock-subtabs > [data-tab="mensal"],
+#stock #stockSubContent > [data-panel="military"],
+#stock #stockSubContent > [data-panel="invoice"],
+#stock #stockSubContent > [data-panel="semanal"],
+#stock #stockSubContent > [data-panel="mensal"] { display:none!important; }
