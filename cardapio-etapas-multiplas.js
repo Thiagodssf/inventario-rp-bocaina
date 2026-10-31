@@ -37,7 +37,22 @@ function install(){
    const idx=Number.isInteger(window.__editingMenuIndex)?window.__editingMenuIndex:-1;
    const record={name,meal:'vale-diario',mealLabel:'Vale diário',stages:stages.map(x=>x[0]),stageValues:stages.map(x=>x[1]),stage:stages[0][0],stageValue:stages[0][1],military,militaryCount:military,authorizedExpense:authorized,items,total,updated:new Date().toISOString()};
    if(idx>=0 && d[idx]) d[idx]={...d[idx],...record}; else d.push({...record,created:new Date().toISOString()});
-   try { put(d); document.dispatchEvent(new Event('bocaina:menus-updated')); alert('Vale salvo com sucesso!'); location.reload(); }
+   try {
+     put(d);
+     document.dispatchEvent(new Event('bocaina:menus-updated'));
+     const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+     const money=v=>Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+     const box=$('#savedMenus');
+     if(box) box.innerHTML=d.length?d.map((m,i)=>{const items=(m.items||[]).map(x=>'<div>✓ '+esc(x.name)+' <span>— '+x.qty+' '+esc(x.unit)+' × '+money(x.price)+' = '+money(x.qty*x.price)+'</span></div>').join('');return '<div style="border:1px solid #d4e0eb;border-radius:7px;padding:9px;margin-bottom:7px"><b>'+esc(m.name)+'</b> — <span class="meal-badge">Vale diário</span> <span class="stage-badge">'+esc(m.stage||'Etapa não definida')+' — '+money(m.stageValue)+'/militar/dia</span> — <strong>'+money(m.total)+'</strong><span style="float:right"><button class="saved-menu-edit" data-editmenu="'+i+'">Editar</button><button class="stock-del" data-delmenu="'+i+'">Excluir</button></span><div class="authorized-detail">Despesa autorizada: <b>'+money(m.authorizedExpense)+'</b> = ('+(m.stages||[]).map(esc).join(' + ')+') × '+Number(m.military||0)+' militar(es)</div><div class="saved-menu-items">'+items+'</div></div>'}).join(''):'<div class="builder-empty">Nenhum vale salvo.</div>';
+     $('#menuName').value='';
+     $('#finalMilitary').value='';
+     document.querySelectorAll('.final-stage-check,.menu-stage-check').forEach(x=>x.checked=false);
+     const list=$('#ingredientList'); if(list)list.innerHTML='';
+     const total=$('#menuTotal'); if(total)total.textContent=money(0);
+     const auth=$('#finalAuthorized'); if(auth)auth.textContent='DESPESA AUTORIZADA: '+money(0);
+     window.__editingMenuIndex=undefined;
+     alert('Vale salvo com sucesso!');
+   }
    catch(err){ console.error(err); alert('Não foi possível salvar o vale: '+(err.message||err)); }
  };
  save.addEventListener('click',saveVale,true);
