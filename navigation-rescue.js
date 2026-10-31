@@ -21,6 +21,11 @@ function injectMobileLayout(){
 @media(max-width:380px){.sidebar{width:218px!important}.header-name span{font-size:16px!important}.header-name strong{font-size:16px!important}#agenda .ag-week{grid-template-columns:30px repeat(7,minmax(0,1fr))!important}#agenda .ag-head{font-size:7px!important}#agenda .ag-hour{font-size:7px!important}}
 `;
  document.head.appendChild(s);
+ if(!document.getElementById('rpSubnavMotion')){
+  const motion=document.createElement('style');motion.id='rpSubnavMotion';
+  motion.textContent=`#rpSubnav{display:block!important;max-height:0;opacity:0;transform:translateY(-9px);overflow:hidden;visibility:hidden;pointer-events:none;transition:max-height .32s ease,opacity .24s ease,transform .32s ease,visibility .32s ease}#rpSubnav.open{display:block!important;max-height:420px;opacity:1;transform:translateY(0);visibility:visible;pointer-events:auto}@media(prefers-reduced-motion:reduce){#rpSubnav{transition:none}}`;
+  document.head.appendChild(motion);
+ }
 }
 function init(){
  injectMobileLayout();
